@@ -9,6 +9,7 @@ buildPackageNames();
 buildPackages();
 
 function buildPackageNames() {
+  fs.mkdirSync(`public`, { recursive: true });
   db.all(`select name from packages`, [], (err, rows) => {
     const packages = rows.map(row => unquoteSimple(row.name));
     const filename = "public/package-names.json";
