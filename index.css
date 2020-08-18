@@ -1,0 +1,21 @@
+table {
+  border-collapse: collapse;
+  letter-spacing: 1px;
+}
+
+th, td {
+  border: 1px solid #333;
+  padding: 0.2em 0.4em;
+}
+
+tbody tr:hover {
+  background-color: #eee;
+}
+
+a {
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
