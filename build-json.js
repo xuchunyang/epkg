@@ -15,7 +15,7 @@ function buildPackageNames() {
     const filename = "public/package-names.json";
     fs.writeFile(filename, JSON.stringify(packages), (err) => {
       if (err) throw err;
-      console.log(`Wrote ${packages.length} package names to ${filename}`);
+      // console.log(`Wrote ${packages.length} package names to ${filename}`);
     });
   });
 }
@@ -61,12 +61,14 @@ function buildPackages() {
           if (err) throw err;
           if (finished === null) finished = 0;
           finished++;
+          /*
           console.log(
             "[%s/%d] %s",
             leftpad0(finished, total.toString().length),
             total,
             row.name
           );
+          */
         });
       });
     },
