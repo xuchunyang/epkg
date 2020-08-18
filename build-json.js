@@ -1,5 +1,3 @@
-/// dump-db.js --- Dump the sqlite3 db as JSON
-
 const fs = require("fs");
 
 // https://github.com/mapbox/node-sqlite3/wiki/API
