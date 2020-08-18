@@ -5,6 +5,9 @@ const sqlite3 = require("sqlite3").verbose();
 
 const db = new sqlite3.Database(process.env.DB || "epkg.sqlite3");
 
+buildPackageNames();
+buildPackages();
+
 function buildPackageNames() {
   db.all(`select name from packages`, [], (err, rows) => {
     const packages = rows.map(row => unquoteSimple(row.name));
