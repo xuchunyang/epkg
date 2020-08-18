@@ -13,6 +13,7 @@ async function run() {
   packageNames.forEach(pkgName => {
     buildHTML(pkgName, template);
   });
+  console.log(`Wrote ${packageNames.length} HTML files`);
 }
 
 async function buildHTML(pkgName, template) {
@@ -27,7 +28,7 @@ async function buildHTML(pkgName, template) {
   await fs.mkdir(`public/${pkgName}`, { recursive: true });
   const file = `${dir}/index.html`;
   await fs.writeFile(file, Mustache.render(template, pkg));
-  console.log(`Wrote ${file}`);
+  // console.log(`Wrote ${file}`);
 }
 
 async function getPackageNames() {
