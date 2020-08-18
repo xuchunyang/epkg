@@ -4,7 +4,8 @@
   "description": "A website for browser Emacs Packages",
   "main": "none",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "make build"
   },
   "repository": {
     "type": "git",
