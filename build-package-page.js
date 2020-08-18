@@ -11,7 +11,7 @@ async function run() {
   Mustache.parse(template);
   const packageNames = await getPackageNames();
   packageNames.forEach(pkgName => {
-    buildHTML(pkgName, template);
+    await buildHTML(pkgName, template);
   });
   console.log(`Wrote ${packageNames.length} HTML files`);
 }
