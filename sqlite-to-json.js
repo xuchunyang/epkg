@@ -7,6 +7,75 @@ const sqlite3 = require("sqlite3").verbose();
 
 const db = new sqlite3.Database(process.env.DB || "epkg.sqlite3");
 
+function buildPackageNames() {
+  db.all(`select name from packages`, [], (err, rows) => {
+    const packages = rows.map(row => unquoteSimple(row.name));
+    const filename = "public/package-names.json";
+    fs.writeFile(filename, JSON.stringify(packages), (err) => {
+      if (err) throw err;
+      console.log(`Wrote ${packages.length} package names to ${filename}`);
+    });
+  });
+}
+
+function buildPackages() {
+  let total = null;
+  let finished = null;
+  db.each(
+    `SELECT * FROM packages`,
+    [],
+    (err, row) => {
+      if (err) throw err;
+      const promises = [];
+      for (const col in row) {
+        if (row[col] === "eieio-unbound") {
+          if (col === "gelpa_recipes" || col === "melpa_recipes") {
+            delete row[col];
+            continue;
+          }
+          // libraries provided required keywords authors maintainers builtin_libraries
+          promises.push(
+            all(`SELECT * FROM ${col} WHERE package = ?`, [row.name], col)
+          );
+        }
+      }
+      promises.push(
+        all(
+          `select * from required where feature = ?`,
+          [unquoteSimple(row.name)],
+          "required_by",
+          "feature"
+        )
+      );
+      Promise.all(promises).then((values) => {
+        for (const [key, val] of values) {
+          row[key] = val;
+        }
+        // console.dir(row, { depth: null });
+        unquoteObj(row);
+        // row.name = unquoteEmacsLispString(row.name);
+        const path = `public/${row.name}.json`;
+        fs.writeFile(path, JSON.stringify(row, null, 2) + "\n", (err) => {
+          if (err) throw err;
+          if (finished === null) finished = 0;
+          finished++;
+          console.log(
+            "[%s/%d] %s",
+            leftpad0(finished, total.toString().length),
+            total,
+            row.name
+          );
+        });
+      });
+    },
+    (err, num) => {
+      if (err) throw err;
+      total = num;
+      console.log("Total %d packages", num);
+    }
+  );
+}
+
 function all(query, params, col, del = "package") {
   return new Promise((resolve, reject) => {
     db.all(query, params, (err, rows) => {
@@ -19,62 +88,6 @@ function all(query, params, col, del = "package") {
     });
   });
 }
-
-let total = null;
-let finished = null;
-db.each(
-  `SELECT * FROM packages`,
-  [],
-  (err, row) => {
-    if (err) throw err;
-    const promises = [];
-    for (const col in row) {
-      if (row[col] === "eieio-unbound") {
-        if (col === "gelpa_recipes" || col === "melpa_recipes") {
-          delete row[col];
-          continue;
-        }
-        // libraries provided required keywords authors maintainers builtin_libraries
-        promises.push(
-          all(`SELECT * FROM ${col} WHERE package = ?`, [row.name], col)
-        );
-      }
-    }
-    promises.push(
-      all(
-        `select * from required where feature = ?`,
-        [unquoteSimple(row.name)],
-        "required_by",
-        "feature"
-      )
-    );
-    Promise.all(promises).then((values) => {
-      for (const [key, val] of values) {
-        row[key] = val;
-      }
-      // console.dir(row, { depth: null });
-      unquoteObj(row);
-      // row.name = unquoteEmacsLispString(row.name);
-      const path = `public/${row.name}.json`;
-      fs.writeFile(path, JSON.stringify(row, null, 2) + "\n", (err) => {
-        if (err) throw err;
-        if (finished === null) finished = 0;
-        finished++;
-        console.log(
-          "[%s/%d] %s",
-          leftpad0(finished, total.toString().length),
-          total,
-          row.name
-        );
-      });
-    });
-  },
-  (err, num) => {
-    if (err) throw err;
-    total = num;
-    console.log("Total %d packages", num);
-  }
-);
 
 function leftpad0(n, len) {
   let s = n.toString();
