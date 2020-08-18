@@ -10,9 +10,9 @@ async function run() {
   const template = await fs.readFile("package.mustache", "utf8");
   Mustache.parse(template);
   const packageNames = await getPackageNames();
-  packageNames.forEach(pkgName => {
+  for (const pkgName of packageNames) {
     await buildHTML(pkgName, template);
-  });
+  }
   console.log(`Wrote ${packageNames.length} HTML files`);
 }
 
