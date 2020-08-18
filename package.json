@@ -16,6 +16,10 @@
   "author": "Xu Chunyang",
   "license": "GPL-3.0-or-later",
   "devDependencies": {
+    "eslint": "^7.7.0"
+  },
+  "dependencies": {
+    "mustache": "^4.0.1",
     "sqlite3": "^5.0.0"
   }
 }
