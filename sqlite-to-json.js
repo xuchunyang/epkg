@@ -7,13 +7,13 @@ const sqlite3 = require("sqlite3").verbose();
 
 const db = new sqlite3.Database(process.env.DB || "epkg.sqlite3");
 
-function all(query, col, params) {
+function all(query, params, col, del = "package") {
   return new Promise((resolve, reject) => {
     db.all(query, params, (err, rows) => {
       if (err) {
         reject(err);
       } else {
-        rows.forEach((row) => delete row.package);
+        rows.forEach((row) => delete row[del]);
         resolve([col, rows]);
       }
     });
@@ -36,10 +36,18 @@ db.each(
         }
         // libraries provided required keywords authors maintainers builtin_libraries
         promises.push(
-          all(`SELECT * FROM ${col} WHERE package = ?`, col, [row.name])
+          all(`SELECT * FROM ${col} WHERE package = ?`, [row.name], col)
         );
       }
     }
+    promises.push(
+      all(
+        `select * from required where feature = ?`,
+        [unquoteSimple(row.name)],
+        "required_by",
+        "feature"
+      )
+    );
     Promise.all(promises).then((values) => {
       for (const [key, val] of values) {
         row[key] = val;
@@ -47,12 +55,17 @@ db.each(
       // console.dir(row, { depth: null });
       unquoteObj(row);
       // row.name = unquoteEmacsLispString(row.name);
-      const path = `public/${row.name}.json`
-      fs.writeFile(path, JSON.stringify(row, null, 2) + "\n", err => {
+      const path = `public/${row.name}.json`;
+      fs.writeFile(path, JSON.stringify(row, null, 2) + "\n", (err) => {
         if (err) throw err;
         if (finished === null) finished = 0;
         finished++;
-        console.log("[%s/%d] %s", leftpad0(finished, total.toString().length), total, row.name);
+        console.log(
+          "[%s/%d] %s",
+          leftpad0(finished, total.toString().length),
+          total,
+          row.name
+        );
       });
     });
   },
@@ -71,11 +84,13 @@ function leftpad0(n, len) {
   return s;
 }
 
+// expect it's much faster than unquoteEmacsLispString
+function unquoteSimple(s) {
+  return s.substring(1, s.length - 1);
+}
+
 // "ag" => ag
 function unquoteEmacsLispString(s) {
-  // not handle \\n
-  // return s.substring(1, s.length - 1);
-
   // NOTE this does NOT work in strict mode, e.g., ES6 module, because
   // "Octal escape sequences are not allowed in strict mode."
   return eval(s);
@@ -86,7 +101,7 @@ function unquoteObj(obj) {
     const v = obj[k];
     if (typeof v === "string") {
       // looks like an Emacs Lisp string
-      if (v[0] === '"' && v[v.length-1] === '"') {
+      if (v[0] === '"' && v[v.length - 1] === '"') {
         obj[k] = unquoteEmacsLispString(v);
       }
     } else if (Array.isArray(v)) {
