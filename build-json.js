@@ -21,8 +21,6 @@ function buildPackageNames() {
 }
 
 function buildPackages() {
-  let total = null;
-  let finished = null;
   db.each(
     `SELECT * FROM packages`,
     [],
@@ -57,24 +55,11 @@ function buildPackages() {
         unquoteObj(row);
         // row.name = unquoteEmacsLispString(row.name);
         const path = `public/${row.name}.json`;
-        fs.writeFile(path, JSON.stringify(row, null, 2) + "\n", (err) => {
-          if (err) throw err;
-          if (finished === null) finished = 0;
-          finished++;
-          /*
-          console.log(
-            "[%s/%d] %s",
-            leftpad0(finished, total.toString().length),
-            total,
-            row.name
-          );
-          */
-        });
+        fs.writeFileSync(path, JSON.stringify(row, null, 2) + "\n");
       });
     },
     (err, num) => {
       if (err) throw err;
-      total = num;
       console.log("Total %d packages", num);
     }
   );
@@ -91,14 +76,6 @@ function all(query, params, col, del = "package") {
       }
     });
   });
-}
-
-function leftpad0(n, len) {
-  let s = n.toString();
-  while (s.length < len) {
-    s = "0" + s;
-  }
-  return s;
 }
 
 // expect it's much faster than unquoteEmacsLispString
