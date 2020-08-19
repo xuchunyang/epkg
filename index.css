@@ -1,4 +1,9 @@
+body {
+  margin: 0;
+}
+
 table {
+  width: 100%;
   border-collapse: collapse;
   letter-spacing: 1px;
 }
@@ -6,6 +11,10 @@ table {
 th, td {
   border: 1px solid #333;
   padding: 0.2em 0.4em;
+}
+
+tbody th {
+  max-width: 10em;
 }
 
 tbody tr:hover {
