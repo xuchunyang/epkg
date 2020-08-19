@@ -5,7 +5,7 @@ build: epkg.sqlite3
 	node build-index.js
 	cp -v *.css public
 	mv public/package-names.json tmp
-	rm public/*.json
+	test "$$USER" = "xcy" || rm public/*.json
 	mv tmp public/package-names.json
 
 epkg.sqlite3:
