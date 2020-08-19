@@ -41,9 +41,17 @@ async function getPackageNames() {
 
 function fixHomepage(pkg) {
   pkg.homepage = pkg.homepage || pkg.url;
-  // "git@github.com:etu/0blayout-mode.git"
-  if (pkg.homepage && pkg.homepage.startsWith("git@github.com:")) {
-    pkg.homepage = pkg.homepage.replace(/^git@github.com:(.*)\.git$/, "https://github.com/$1")
+  if (pkg.homepage) {
+    // git@github.com:etu/0blayout-mode.git
+    if (pkg.homepage.startsWith("git@github.com:")) {
+      pkg.homepage = pkg.homepage.replace(/^git@github.com:(.*)\.git$/, "https://github.com/$1");
+      return;
+    }
+    // git@gitlab.com:egh/zotxt-emacs.git
+    if (pkg.homepage.startsWith("git@gitlab.com:")) {
+      pkg.homepage = pkg.homepage.replace(/^git@gitlab.com:(.*)\.git$/, "https://gitlab.com/$1");
+      return;
+    }
   }
 }
 
