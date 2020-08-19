@@ -1,4 +1,4 @@
-# A basic website for browser Emacs packages
+# A basic website for browse Emacs packages
 
 These packages data is provided by the Emacsmirror package database:https://github.com/emacsmirror/epkgs
 
