@@ -13,6 +13,10 @@
     <p>Homepage: <a href="{{{homepage}}}">{{{homepage}}}</a></p>
     {{/homepage}}
 
+    {{#authors_rendered}}
+    <p>Author: {{authors_rendered}}</p>
+    {{/authors_rendered}}
+
     {{#updated}}
     <p>Updated: <time datetime="{{updated.iso}}">{{updated.readable}}</time></p>
     {{/updated}}

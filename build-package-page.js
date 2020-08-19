@@ -24,6 +24,10 @@ async function buildHTML(pkgName, template) {
   fixUpdated(pkg);
   pkg.hasDependencies = pkg.required.length > 0;
   pkg.hasReverseDependencies = pkg.required_by.length > 0;
+  if (pkg.authors) {
+    pkg.authors_rendered =
+      pkg.authors.map(author => author.name).join(", ");
+  }
   const dir = `public/${pkgName}`;
   await fs.mkdir(`public/${pkgName}`, { recursive: true });
   const file = `${dir}/index.html`;
