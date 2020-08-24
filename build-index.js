@@ -10,12 +10,10 @@ async function run() {
     const jsonFile = `public/${pkgName}.json`;
     return JSON.parse(fs.readFileSync(jsonFile, "utf8"));
   });
-  const view = {pkgs};
-  const template = fs.readFileSync("index.mustache", "utf8");
-  fs.writeFileSync("public/index.html", Mustache.render(template, view));
-  fs.copyFileSync("index.css", "public/index.css");
+  const data = pkgs.map(p => [p.name, p.summary]);
+  fs.writeFileSync("public/.index.json", JSON.stringify(data));
 }
 
 function getPackageNames() {
-  return JSON.parse(fs.readFileSync("public/package-names.json", "utf8"));
+  return JSON.parse(fs.readFileSync("public/.package-names.json", "utf8"));
 }

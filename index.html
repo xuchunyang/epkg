@@ -11,6 +11,10 @@
     <script>
       $(document).ready( function () {
         $("table").DataTable( {
+          ajax: {
+            url: "public/.index.json",
+            dataSrc: ""
+          },
           pageLength: 10,
           stateSave: true
         });
@@ -23,14 +27,6 @@
         <th>Package</th>
         <th>Description</th>
       </thead>
-      <tbody>
-        {{#pkgs}}
-        <tr>
-          <th><a href="{{{name}}}">{{name}}</a></th>
-          <td>{{summary}}</td>
-        </tr>
-        {{/pkgs}}
-      </tbody>
     </table>
     <!-- FIXME: Whenever emacsmirror/epkgs/master/epkg.sql changes, the site should rebuild -->
     <!-- Updated: $Date: 2020-08-24 $ -->
