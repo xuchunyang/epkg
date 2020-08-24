@@ -16,6 +16,13 @@
             cache: true,
             dataSrc: "",
           },
+          deferRender: true,
+          columnDefs: [ {
+            targets: 0,
+            render: function ( data, type, row ) {
+              return `<a href="${data}">${data}</a>`;
+            }
+          } ],
           pageLength: 10,
           stateSave: true
         });
