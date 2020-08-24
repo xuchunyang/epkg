@@ -10,6 +10,15 @@ th, td {
   border: 1px solid #333;
 }
 
+tbody tr td:first-child {
+  color: #2d48e0;
+}
+
+tbody tr td:first-child:hover {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 a {
   text-decoration: none;
 }
