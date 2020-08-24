@@ -4,6 +4,7 @@ build: epkg.sqlite3
 	node build-package-page.js
 	node build-index.js
 	cp -v *.css public
+	cp -v *.html public
 	test "$$USER" = "xcy" || rm public/*.json
 
 epkg.sqlite3:
