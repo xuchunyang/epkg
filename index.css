@@ -2,8 +2,14 @@ body {
   font-family: system-ui, sans-serif;
 }
 
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
 table {
   border-collapse: collapse;
+  padding-top: 5px;
 }
 
 th, td {
