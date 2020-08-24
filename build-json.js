@@ -12,7 +12,7 @@ function buildPackageNames() {
   fs.mkdirSync(`public`, { recursive: true });
   db.all(`select name from packages`, [], (err, rows) => {
     const packages = rows.map(row => unquoteSimple(row.name));
-    const filename = "public/package-names.json";
+    const filename = "public/.package-names.json";
     fs.writeFile(filename, JSON.stringify(packages), (err) => {
       if (err) throw err;
       // console.log(`Wrote ${packages.length} package names to ${filename}`);
