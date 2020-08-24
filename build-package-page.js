@@ -3,6 +3,8 @@ const assert = require("assert").strict;
 const Mustache = require("mustache");
 
 run().catch(e => {
+  // NOTE Right now, throw promise rejections does not set exitCode to non-zero
+  process.exitCode = 1;
   throw e;
 });
 
