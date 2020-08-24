@@ -36,7 +36,7 @@ async function buildHTML(pkgName, template) {
 }
 
 async function getPackageNames() {
-  return JSON.parse(await fs.readFile("public/package-names.json", "utf8"));
+  return JSON.parse(await fs.readFile("public/.package-names.json", "utf8"));
 }
 
 function fixHomepage(pkg) {
