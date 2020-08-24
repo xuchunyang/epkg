@@ -13,7 +13,8 @@
         $("table").DataTable( {
           ajax: {
             url: ".index.json",
-            dataSrc: ""
+            cache: true,
+            dataSrc: "",
           },
           pageLength: 10,
           stateSave: true
