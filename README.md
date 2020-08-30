@@ -9,3 +9,10 @@ https://epkg.vercel.app/
 https://epkg.vercel.app/ag/
 
 ![screen shot of the ag package](ag.png)
+
+## Build
+
+The website is a static site.
+
+- To build it, type `make`
+- To preview it, type `cd public && python3 -m http.server`
