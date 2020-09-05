@@ -15,7 +15,7 @@ jobs:
       - name: Update timestamp
         # sed and date must be from GNU Coreutils
         run: |
-          gsed --in-place "\$s/\$Date: [-0-9]\+/\$Date: $(date -I)/" index.html
+          sed --in-place "\$s/\$Date: [-0-9]\+/\$Date: $(date -I)/" index.html
 
       - name: Commit changes
         uses: EndBug/add-and-commit@v4.4.0
