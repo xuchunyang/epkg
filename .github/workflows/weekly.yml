@@ -1,7 +1,6 @@
 name: update timestamp weekly to trigger website rebuild
 
 on:
-  push:                         # test for once
   schedule:
     - cron: '0 0 * * 0'
 
