@@ -1,0 +1,27 @@
+name: rebuild weekly
+
+on:
+  push:                         # test for once
+  schedule:
+    - cron: '0 0 * * 0'
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+
+      - name: Update timestamp
+        # sed and date must be from GNU Coreutils
+        run: gsed --in-place "\$s/\$Date: [-0-9]\+/\$Date: $(date -I)/" index.html
+
+      - name: Commit changes
+        uses: EndBug/add-and-commit@v4.4.0
+        with:
+          author_name: Xu Chunyang
+          author_email: xuchunyang56@gmail.com
+          message: Weekly update
+          add: index.html
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
