@@ -1,0 +1,8 @@
+{
+  "routes": [
+    { "handle": "filesystem" },
+    { "src": "/favicon.ico", "status": 404 },
+    { "src": "/([^/]+).json", "dest": "/api/info?name=$1" },
+    { "src": "/([^/]+)", "dest": "/api/show?name=$1" }
+  ]
+}

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{{name}}</title>
+    <link href="package.css" rel="stylesheet" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>{{name}}</h1>
+
+      <dl>
+        {% if summary %}
+        <dt>Summary</dt>
+        <dd>{{summary}}</dd>
+        {% endif %}
+
+        {% if url %}
+        <dt>Home page</dt>
+        <dd><a href="{{url}}">{{url}}</a></dd>
+        {% endif %}
+
+        {% if authors %}
+        <dt>Author</dt>
+        <dd>{{authors}}</dd>
+        {% endif %}
+
+        {% if maintainers %}
+        <dt>Maintainer</dt>
+        <dd>{{maintainers}}</dd>
+        {% endif %}
+
+        {% if updated %}
+        <dt>Updated</dt>
+        <dd>{{updated}}</dd>
+        {% endif %}
+
+        {% if license %}
+        <dt>License</dt>
+        <dd>{{license}}</dd>
+        {% endif %}
+      </dl>
+
+      {% if commentary %}
+      <pre>{{commentary}}</pre>
+      {% endif %}
+
+      <h2>Dependencies</h2>
+      {% if required.length > 0 %}
+      <p>{{name}} depends on {{required.length}} packages:</p>
+      <ul>
+        {% for item in required %}
+        {% if item.feature === "cl" %}
+        <li>{{ item.feature }}</li>
+        {% else %}
+        <li><a href="/{{item.feature}}">{{ item.feature }}</a></li>
+        {% endif %}
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p>{{name}} does not have any dependencies.</p>
+      {% endif %}
+
+      <h2>Reverse dependencies</h2>
+      {% if required_by.length > 0 %}
+      <p>{{required_by.length}} packages depends on {{name}}:</p>
+      <ul>
+        {% for item in required_by %}
+        <li><a href="/{{item}}">{{ item }}</a></li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p>No package depends on {{name}}.</p>
+      {% endif %}
+    </div>
+  </body>
+</html>

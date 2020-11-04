@@ -1,6 +1,25 @@
+body {
+  line-height: 1.5;
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+h1 {
+  text-align: center;
+}
+
 pre {
   background-color: #fafafa;
   border: 1px solid #dadada;
   padding: 1em;
   width: max-content;
+  font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace;
+}
+
+a:link,
+a:visited {
+  color: blue;
 }

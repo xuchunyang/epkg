@@ -6,6 +6,7 @@
   "dependencies": {
     "eslint": "^7.7.0",
     "mustache": "^4.0.1",
+    "nunjucks": "^3.2.2",
     "sqlite3": "^5.0.0"
   },
   "scripts": {
