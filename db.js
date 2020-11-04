@@ -1,12 +1,6 @@
 const sqlite3 = require("sqlite3").verbose();
-const db = new sqlite3.Database("epkg.sqlite3");
-
-console.log("PWD", process.env.PWD);
-console.log("CWD", process.cwd);
-
-console.log(".", fs.readdirSync("."));
-console.log();
-console.log("..", fs.readdirSync("..."));
+const path = require("path");
+const db = new sqlite3.Database(path.resolve(__dirname, "epkg.sqlite3"));
 
 dbGet = async (sql, params) => {
   return new Promise((resolve, reject) => {
@@ -61,9 +55,7 @@ const queryPackage = async (name) => {
   pkg.required_by = (
     await Promise.all(
       pkg.provided.map(({ feature }) => {
-        return dbAll(`select * from required where feature = ?`, [
-          feature,
-        ]);
+        return dbAll(`select * from required where feature = ?`, [feature]);
       })
     )
   ).reduce((acc, elt) => acc.concat(elt));
