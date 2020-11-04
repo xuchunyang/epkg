@@ -5,5 +5,10 @@
     { "src": "/favicon.ico", "status": 404 },
     { "src": "/([^/]+).json", "dest": "/api/info?name=$1" },
     { "src": "/([^/]+)", "dest": "/api/show?name=$1" }
-  ]
+  ],
+  "functions": {
+    "api/*.js": {
+      "includeFiles": "*.sqlite3"
+    }
+  }
 }
