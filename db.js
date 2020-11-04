@@ -72,7 +72,6 @@ function unquoteSimple(s) {
 }
 
 function unquoteEmacsLispString(s) {
-  console.log(s);
   // NOTE this does NOT work in strict mode, e.g., ES6 module, because
   // "Octal escape sequences are not allowed in strict mode."
   return eval(s);
