@@ -1,26 +1,24 @@
 {
   "name": "epkg",
-  "version": "0.0.0",
-  "description": "A website for browser Emacs Packages",
-  "main": "none",
+  "version": "1.0.0",
+  "description": "These packages data is provided by the Emacsmirror package database:https://github.com/emacsmirror/epkgs",
+  "private": true,
+  "dependencies": {
+    "eslint": "^7.7.0",
+    "mustache": "^4.0.1",
+    "sqlite3": "^5.0.0"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "make build"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "FIXME"
+    "url": "git+https://github.com/xuchunyang/epkg.git"
   },
-  "keywords": [
-    "emacs"
-  ],
-  "author": "Xu Chunyang",
+  "author": "",
   "license": "GPL-3.0-or-later",
-  "devDependencies": {
-    "eslint": "^7.7.0"
+  "bugs": {
+    "url": "https://github.com/xuchunyang/epkg/issues"
   },
-  "dependencies": {
-    "mustache": "^4.0.1",
-    "sqlite3": "^5.0.0"
-  }
+  "homepage": "https://github.com/xuchunyang/epkg#readme"
 }
