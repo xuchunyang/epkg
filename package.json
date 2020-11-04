@@ -1,7 +1,7 @@
 {
   "name": "epkg",
   "version": "1.0.0",
-  "description": "These packages data is provided by the Emacsmirror package database:https://github.com/emacsmirror/epkgs",
+  "description": "browse emacs packages",
   "private": true,
   "dependencies": {
     "eslint": "^7.7.0",
@@ -10,13 +10,14 @@
     "sqlite3": "^5.0.0"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "make epkg.sqlite3"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/xuchunyang/epkg.git"
   },
-  "author": "",
+  "author": "Xu Chunyang",
   "license": "GPL-3.0-or-later",
   "bugs": {
     "url": "https://github.com/xuchunyang/epkg/issues"
