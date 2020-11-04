@@ -12,9 +12,9 @@
       $(document).ready( function () {
         $("table").DataTable( {
           ajax: {
-            url: ".index.json",
+            url: "/api/list",
             cache: true,
-            dataSrc: "",
+            dataSrc: "data",
           },
           deferRender: true,
           pageLength: 10,
