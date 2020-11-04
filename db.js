@@ -1,6 +1,13 @@
 const sqlite3 = require("sqlite3").verbose();
 const db = new sqlite3.Database("epkg.sqlite3");
 
+console.log("PWD", process.env.PWD);
+console.log("CWD", process.cwd);
+
+console.log(".", fs.readdirSync("."));
+console.log();
+console.log("..", fs.readdirSync("..."));
+
 dbGet = async (sql, params) => {
   return new Promise((resolve, reject) => {
     db.get(sql, params, (err, row) => {
