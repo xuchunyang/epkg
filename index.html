@@ -1,40 +1,14 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Emacs Packages</title>
-    <link href="index.css" rel="stylesheet">
-    <link href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
-    <script>
-      $(document).ready( function () {
-        $("table").DataTable( {
-          ajax: {
-            url: "/api/list",
-            cache: true,
-            dataSrc: "data",
-          },
-          deferRender: true,
-          pageLength: 10,
-          stateSave: true
-        });
-
-        document.onclick = e => {
-          if (!e.target.matches("tbody tr td:first-child")) return;
-
-          const pkgName = e.target.textContent;
-          const url = "/" + pkgName;
-
-          // reuse current tab:
-          // window.location.replace(url);
-
-          // open new tab:
-          window.open(url);
-        };
-      } );
-    </script>
+    <link href="index.css" rel="stylesheet" />
+    <link
+      href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css"
+      rel="stylesheet"
+    />
   </head>
   <body>
     <div class="container">
@@ -45,6 +19,8 @@
         </thead>
       </table>
     </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+    <script src="index.js"></script>
   </body>
 </html>
-<!-- Updated: $Date: 2020-11-01 $ -->

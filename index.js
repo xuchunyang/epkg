@@ -15,11 +15,6 @@ $(document).ready(() => {
 
     const pkgName = e.target.textContent;
     const url = "/" + pkgName;
-
-    // reuse current tab:
-    // window.location.replace(url);
-
-    // open new tab:
-    window.open(url);
+    window.location.href = url;
   };
 });
