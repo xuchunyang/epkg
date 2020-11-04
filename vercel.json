@@ -1,5 +1,6 @@
 {
   "routes": [
+    { "src": "/", "dest": "/index.html" },
     { "handle": "filesystem" },
     { "src": "/favicon.ico", "status": 404 },
     { "src": "/([^/]+).json", "dest": "/api/info?name=$1" },
