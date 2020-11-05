@@ -23,4 +23,18 @@ async function list() {
 
 // list().then((x) => console.log(x));
 
-module.exports = { list };
+async function info(name) {
+  try {
+    await client.connect();
+    const db = client.db(basename(MONGODB_URI));
+    const collection = db.collection("packages");
+    return await collection.findOne({ name });
+  } finally {
+    console.log("closing mongodb connection");
+    await client.close();
+  }
+}
+
+module.exports = { list, info };
+
+// info("magit").then((x) => console.log(x));

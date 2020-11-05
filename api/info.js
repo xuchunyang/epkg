@@ -1,4 +1,4 @@
-const { db, queryPackage } = require("../db.js");
+const { info } = require("../mongodb.js");
 
 module.exports = async (req, res) => {
   const {
@@ -11,9 +11,8 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const data = await queryPackage(name);
-    db.close();
-    // when no match found, data is undefined
+    const data = await info(name);
+    // when no match found, data is null
     if (!data) {
       res.status(404).json({ error: `No such package: ${name}` });
       return;
