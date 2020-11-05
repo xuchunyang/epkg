@@ -21,6 +21,6 @@ async function list() {
   }
 }
 
-list().then((x) => console.log(x));
+// list().then((x) => console.log(x));
 
 module.exports = { list };
