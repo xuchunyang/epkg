@@ -47,6 +47,8 @@ module.exports = async (req, res) => {
     myData.required_by = uniq(data.required_by.map(o => o.package)).sort();
     const html = nunjucks.render("template.njk", myData);
     res.setHeader("Content-Type", "text/html; charset=UTF-8");
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Cache-Control", `max-age=0, s-maxage=${30 * 24}`);    
     res.end(html);
   } catch (err) {
     console.error(err);
