@@ -8,5 +8,10 @@
     { "src": "/feed.xml", "status": 404 },
     { "src": "/manifest.json", "status": 404 },
     { "src": "/([^/]+).json", "dest": "/api/info?name=$1" }
-  ]
+  ],
+  "functions": {
+    "api/show.js": {
+      "includeFiles": "template.njk"
+    }
+  }
 }
