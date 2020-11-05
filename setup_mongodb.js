@@ -3,16 +3,17 @@ const { MongoClient } = require("mongodb");
 const { allPackages } = require("./db.js");
 const { basename } = require("path");
 
-const main = async () => {
-  const MONGODB_URI = process.env.MONGODB_URI || "mongodb://pc.lan:27017/epkg";
-  console.log(`Connecting to ${MONGODB_URI}...`);
-  const client = new MongoClient(MONGODB_URI, {
-    useUnifiedTopology: true,
-  });
-  await client.connect();
-  const db = client.db(basename(MONGODB_URI));
-  console.log(`Connected to ${MONGODB_URI}`);
+const MONGODB_URI = process.env.MONGODB_URI || "mongodb://pc.lan:27017/epkg";
+const DB_NAME = new URL(MONGODB_URI).pathname.slice(1);
+const client = new MongoClient(MONGODB_URI, {
+  useUnifiedTopology: true,
+});
 
+const main = async () => {
+  console.log(`Connecting to ${MONGODB_URI}...`);
+  await client.connect();
+  console.log(`Connected to ${MONGODB_URI}`);
+  const db = client.db(DB_NAME);
   console.log("Getting packages from SQLite...");
   const pkgs = await allPackages();
   console.log(`Got ${pkgs.length} packages`);

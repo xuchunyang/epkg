@@ -1,7 +1,7 @@
-const { basename } = require("path");
 const { MongoClient } = require("mongodb");
 
 const MONGODB_URI = process.env.MONGODB_URI || "mongodb://pc.lan:27017/epkg";
+const DB_NAME = new URL(MONGODB_URI).pathname.slice(1);
 const client = new MongoClient(MONGODB_URI, {
   useUnifiedTopology: true,
 });
@@ -9,7 +9,7 @@ const client = new MongoClient(MONGODB_URI, {
 async function list() {
   try {
     await client.connect();
-    const db = client.db(basename(MONGODB_URI));
+    const db = client.db(DB_NAME);
     const collection = db.collection("packages");
     const projection = { name: 1, summary: 1, _id: 0 };
     const cursor = collection.find().project(projection);
@@ -26,7 +26,7 @@ async function list() {
 async function info(name) {
   try {
     await client.connect();
-    const db = client.db(basename(MONGODB_URI));
+    const db = client.db(DB_NAME);
     const collection = db.collection("packages");
     return await collection.findOne({ name });
   } finally {

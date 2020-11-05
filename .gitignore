@@ -2,3 +2,4 @@
 .vercel
 /epkg.sqlite3
 /all.json
+/.env
