@@ -5,6 +5,7 @@
   "private": true,
   "dependencies": {
     "eslint": "^7.7.0",
+    "mongodb": "^3.6.2",
     "nunjucks": "^3.2.2",
     "sqlite3": "^5.0.0"
   },

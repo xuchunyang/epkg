@@ -100,7 +100,7 @@ const dumpToJson = (jsonFile) => {
   });
 };
 
-module.exports = { db, queryPackage, list, dumpToJson };
+module.exports = { db, queryPackage, list, dumpToJson, allPackages };
 
 function unquoteSimple(s) {
   return s.substring(1, s.length - 1);
