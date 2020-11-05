@@ -2,10 +2,11 @@
   "routes": [
     { "src": "/", "dest": "/index.html" },
     { "handle": "filesystem" },
+    { "src": "/([^/.]+)", "dest": "/api/show?name=$1" },
     { "src": "/favicon.ico", "status": 404 },
-    { "src": "/*.txt", "status": 404 },
-    { "src": "/*.json", "status": 404 },
-    { "src": "/*.xml", "status": 404 },
-    { "src": "/([^/]+)", "dest": "/api/show?name=$1" }
+    { "src": "/robots.txt", "status": 404 },
+    { "src": "/feed.xml", "status": 404 },
+    { "src": "/manifest.json", "status": 404 },
+    { "src": "/([^/]+).json", "dest": "/api/info?name=$1" }
   ]
 }
