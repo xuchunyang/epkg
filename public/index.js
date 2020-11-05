@@ -3,7 +3,7 @@ $(document).ready(() => {
     ajax: {
       url: "/api/list",
       cache: true,
-      dataSrc: "data",
+      dataSrc: "",
     },
     deferRender: true,
     pageLength: 10,
