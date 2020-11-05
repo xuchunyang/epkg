@@ -3,12 +3,9 @@
     { "src": "/", "dest": "/index.html" },
     { "handle": "filesystem" },
     { "src": "/favicon.ico", "status": 404 },
-    { "src": "/([^/]+).json", "dest": "/api/info?name=$1" },
+    { "src": "/*.txt", "status": 404 },
+    { "src": "/*.json", "status": 404 },
+    { "src": "/*.xml", "status": 404 },
     { "src": "/([^/]+)", "dest": "/api/show?name=$1" }
-  ],
-  "functions": {
-    "api/*.js": {
-      "includeFiles": "*.sqlite3"
-    }
-  }
+  ]
 }

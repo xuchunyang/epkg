@@ -6,6 +6,7 @@ const { basename } = require("path");
 const MONGODB_URI = process.env.MONGODB_URI || "mongodb://pc.lan:27017/epkg";
 const DB_NAME = new URL(MONGODB_URI).pathname.slice(1);
 const client = new MongoClient(MONGODB_URI, {
+  useNewUrlParser: true,
   useUnifiedTopology: true,
 });
 
