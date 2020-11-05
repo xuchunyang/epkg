@@ -1,6 +1,8 @@
 const sqlite3 = require("sqlite3").verbose();
 const path = require("path");
-const db = new sqlite3.Database(path.resolve(__dirname, "epkg.sqlite3"));
+const fs = require("fs");
+
+const db = new sqlite3.Database("epkg.sqlite3");
 
 dbGet = async (sql, params) => {
   return new Promise((resolve, reject) => {
@@ -20,11 +22,7 @@ dbAll = async (sql, params) => {
   });
 };
 
-const queryPackage = async (name) => {
-  const pkg = await dbGet(`select * from packages where name = ?`, [
-    `"${name}"`,
-  ]);
-  if (!pkg) return;
+const fillPackage = async (pkg) => {
   const promises = [];
   for (const key in pkg) {
     if (pkg[key] === "eieio-unbound") {
@@ -58,13 +56,51 @@ const queryPackage = async (name) => {
         return dbAll(`select * from required where feature = ?`, [feature]);
       })
     )
-  ).reduce((acc, elt) => acc.concat(elt));
+  ).reduce((acc, elt) => acc.concat(elt), []);
 
   unquoteObj(pkg);
+  console.log("Filled", pkg.name);
   return pkg;
 };
 
-module.exports = { db, queryPackage };
+const queryPackage = async (name) => {
+  const pkg = await dbGet(`select * from packages where name = ?`, [
+    `"${name}"`,
+  ]);
+  if (!pkg) return;
+  return fillPackage(pkg);
+};
+
+const list = async () => {
+  const rows = await dbAll(`select name from packages`, []);
+  const unquote = (s) => s.substring(1, s.length - 1);
+  return rows.map((o) => unquote(o.name));
+};
+
+const allPackages = async () => {
+  const pkgs = await dbAll(`select * from packages`);
+  return Promise.all(pkgs.map(fillPackage));
+};
+
+const dumpToJson = (jsonFile) => {
+  allPackages().then((pkgs) => {
+    const count = pkgs.length;
+    const data = {};
+    pkgs.forEach((pkg) => {
+      data[pkg.name] = pkg;
+    });
+    const updated = new Date().toJSON();
+    const obj = {
+      count,
+      updated,
+      data,
+    };
+    fs.writeFileSync(jsonFile, JSON.stringify(obj, null, 2));
+    db.close();
+  });
+};
+
+module.exports = { db, queryPackage, list, dumpToJson };
 
 function unquoteSimple(s) {
   return s.substring(1, s.length - 1);
