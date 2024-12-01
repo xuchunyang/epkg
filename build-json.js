@@ -29,7 +29,8 @@ function buildPackages() {
       const promises = [];
       for (const col in row) {
         if (row[col] === "eieio-unbound") {
-          if (col === "gelpa_recipes" || col === "melpa_recipes") {
+
+          if (col.endsWith('_recipes')) {
             delete row[col];
             continue;
           }
