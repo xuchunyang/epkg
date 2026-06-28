@@ -8,5 +8,4 @@ build: epkg.sqlite3
 	test "$$USER" = "xcy" || rm public/*.json
 
 epkg.sqlite3:
-	curl https://raw.githubusercontent.com/emacsmirror/epkgs/master/epkg.sql | sqlite3 epkg.sqlite3
-
+	node build-db.js
