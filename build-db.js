@@ -1,6 +1,6 @@
 const fs = require("fs");
 const https = require("https");
-const initSqlJs = require("sql.js");
+const { spawn } = require("child_process");
 
 const dbFile = process.env.DB || "epkg.sqlite3";
 const sqlURL = "https://raw.githubusercontent.com/emacsmirror/epkgs/master/epkg.sql";
@@ -12,12 +12,8 @@ run().catch(err => {
 
 async function run() {
   fs.rmSync(dbFile, { force: true });
-  const SQL = await initSqlJs();
   const sql = await download(sqlURL);
-  const db = new SQL.Database();
-  db.run(sql);
-  fs.writeFileSync(dbFile, Buffer.from(db.export()));
-  db.close();
+  await importSQL(sql);
 }
 
 function download(url) {
@@ -36,5 +32,20 @@ function download(url) {
       });
       res.on("end", () => resolve(data));
     }).on("error", reject);
+  });
+}
+
+function importSQL(sql) {
+  return new Promise((resolve, reject) => {
+    const child = spawn("sqlite3", [dbFile], { stdio: ["pipe", "inherit", "inherit"] });
+    child.on("error", reject);
+    child.on("close", code => {
+      if (code === 0) {
+        resolve();
+      } else {
+        reject(new Error(`sqlite3 exited with code ${code}`));
+      }
+    });
+    child.stdin.end(sql);
   });
 }

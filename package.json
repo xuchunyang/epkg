@@ -16,7 +16,6 @@
   "author": "Xu Chunyang",
   "license": "GPL-3.0-or-later",
   "dependencies": {
-    "mustache": "^4.2.0",
-    "sql.js": "^1.14.1"
+    "mustache": "^4.2.0"
   }
 }

@@ -1,32 +1,20 @@
 const fs = require("fs");
-const initSqlJs = require("sql.js");
+const { execFileSync } = require("child_process");
 
-run().catch(err => {
-  process.exitCode = 1;
-  throw err;
-});
+const db = process.env.DB || "epkg.sqlite3";
 
-async function run() {
-  const SQL = await initSqlJs();
-  const data = fs.readFileSync(process.env.DB || "epkg.sqlite3");
-  const db = new SQL.Database(data);
+buildPackageNames();
+buildPackages();
 
-  try {
-    const packageNames = buildPackageNames(db);
-    buildPackages(db);
-    fs.writeFileSync("public/.package-names.json", JSON.stringify(packageNames));
-  } finally {
-    db.close();
-  }
-}
-
-function buildPackageNames(db) {
+function buildPackageNames() {
   fs.mkdirSync("public", { recursive: true });
-  return all(db, "select name from packages").map(row => unquoteSimple(row.name));
+  const packages = all("select name from packages").map(row => unquoteSimple(row.name));
+  const filename = "public/.package-names.json";
+  fs.writeFileSync(filename, JSON.stringify(packages));
 }
 
-function buildPackages(db) {
-  const rows = all(db, "SELECT * FROM packages");
+function buildPackages() {
+  const rows = all("SELECT * FROM packages");
 
   for (const row of rows) {
     for (const col in row) {
@@ -36,14 +24,12 @@ function buildPackages(db) {
           continue;
         }
         // libraries provided required keywords authors maintainers builtin_libraries
-        row[col] = all(db, `SELECT * FROM ${col} WHERE package = ?`, [row.name], "package");
+        row[col] = all(`SELECT * FROM ${col} WHERE package = ${sqlQuote(row.name)}`, "package");
       }
     }
 
     row.required_by = all(
-      db,
-      "select * from required where feature = ?",
-      [unquoteSimple(row.name)],
+      `select * from required where feature = ${sqlQuote(unquoteSimple(row.name))}`,
       "feature"
     );
 
@@ -55,24 +41,17 @@ function buildPackages(db) {
   console.log("Total %d packages", rows.length);
 }
 
-function all(db, query, params = [], del) {
-  const stmt = db.prepare(query);
-  const rows = [];
-
-  try {
-    stmt.bind(params);
-    while (stmt.step()) {
-      const row = stmt.getAsObject();
-      if (del) {
-        delete row[del];
-      }
-      rows.push(row);
-    }
-  } finally {
-    stmt.free();
+function all(query, del) {
+  const output = execFileSync("sqlite3", ["-json", db, query], { encoding: "utf8" });
+  const rows = output ? JSON.parse(output) : [];
+  if (del) {
+    rows.forEach(row => delete row[del]);
   }
-
   return rows;
+}
+
+function sqlQuote(value) {
+  return `'${value.replace(/'/g, "''")}'`;
 }
 
 // expect it's much faster than unquoteEmacsLispString
