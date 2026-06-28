@@ -1,6 +1,6 @@
 .PHONY: build
 build: epkg.sqlite3
-	node build-json.js
+	python3 build-json.py
 	node build-package-page.js
 	node build-index.js
 	cp -v *.css public
@@ -8,4 +8,4 @@ build: epkg.sqlite3
 	test "$$USER" = "xcy" || rm public/*.json
 
 epkg.sqlite3:
-	node build-db.js
+	python3 build-db.py
