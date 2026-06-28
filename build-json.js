@@ -1,82 +1,78 @@
 const fs = require("fs");
+const initSqlJs = require("sql.js");
 
-// https://github.com/mapbox/node-sqlite3/wiki/API
-const sqlite3 = require("sqlite3").verbose();
+run().catch(err => {
+  process.exitCode = 1;
+  throw err;
+});
 
-const db = new sqlite3.Database(process.env.DB || "epkg.sqlite3");
+async function run() {
+  const SQL = await initSqlJs();
+  const data = fs.readFileSync(process.env.DB || "epkg.sqlite3");
+  const db = new SQL.Database(data);
 
-buildPackageNames();
-buildPackages();
-
-function buildPackageNames() {
-  fs.mkdirSync(`public`, { recursive: true });
-  db.all(`select name from packages`, [], (err, rows) => {
-    const packages = rows.map(row => unquoteSimple(row.name));
-    const filename = "public/.package-names.json";
-    fs.writeFile(filename, JSON.stringify(packages), (err) => {
-      if (err) throw err;
-      // console.log(`Wrote ${packages.length} package names to ${filename}`);
-    });
-  });
+  try {
+    const packageNames = buildPackageNames(db);
+    buildPackages(db);
+    fs.writeFileSync("public/.package-names.json", JSON.stringify(packageNames));
+  } finally {
+    db.close();
+  }
 }
 
-function buildPackages() {
-  db.each(
-    `SELECT * FROM packages`,
-    [],
-    (err, row) => {
-      if (err) throw err;
-      const promises = [];
-      for (const col in row) {
-        if (row[col] === "eieio-unbound") {
+function buildPackageNames(db) {
+  fs.mkdirSync("public", { recursive: true });
+  return all(db, "select name from packages").map(row => unquoteSimple(row.name));
+}
 
-          if (col.endsWith('_recipes')) {
-            delete row[col];
-            continue;
-          }
-          // libraries provided required keywords authors maintainers builtin_libraries
-          promises.push(
-            all(`SELECT * FROM ${col} WHERE package = ?`, [row.name], col)
-          );
+function buildPackages(db) {
+  const rows = all(db, "SELECT * FROM packages");
+
+  for (const row of rows) {
+    for (const col in row) {
+      if (row[col] === "eieio-unbound") {
+        if (col.endsWith("_recipes")) {
+          delete row[col];
+          continue;
         }
+        // libraries provided required keywords authors maintainers builtin_libraries
+        row[col] = all(db, `SELECT * FROM ${col} WHERE package = ?`, [row.name], "package");
       }
-      promises.push(
-        all(
-          `select * from required where feature = ?`,
-          [unquoteSimple(row.name)],
-          "required_by",
-          "feature"
-        )
-      );
-      Promise.all(promises).then((values) => {
-        for (const [key, val] of values) {
-          row[key] = val;
-        }
-        // console.dir(row, { depth: null });
-        unquoteObj(row);
-        // row.name = unquoteEmacsLispString(row.name);
-        const path = `public/${row.name}.json`;
-        fs.writeFileSync(path, JSON.stringify(row, null, 2) + "\n");
-      });
-    },
-    (err, num) => {
-      if (err) throw err;
-      console.log("Total %d packages", num);
     }
-  );
+
+    row.required_by = all(
+      db,
+      "select * from required where feature = ?",
+      [unquoteSimple(row.name)],
+      "feature"
+    );
+
+    unquoteObj(row);
+    const path = `public/${row.name}.json`;
+    fs.writeFileSync(path, JSON.stringify(row, null, 2) + "\n");
+  }
+
+  console.log("Total %d packages", rows.length);
 }
 
-function all(query, params, col, del = "package") {
-  return new Promise((resolve, reject) => {
-    db.all(query, params, (err, rows) => {
-      if (err) {
-        reject(err);
-      } else {
-        rows.forEach((row) => delete row[del]);
-        resolve([col, rows]);
+function all(db, query, params = [], del) {
+  const stmt = db.prepare(query);
+  const rows = [];
+
+  try {
+    stmt.bind(params);
+    while (stmt.step()) {
+      const row = stmt.getAsObject();
+      if (del) {
+        delete row[del];
       }
-    });
-  });
+      rows.push(row);
+    }
+  } finally {
+    stmt.free();
+  }
+
+  return rows;
 }
 
 // expect it's much faster than unquoteEmacsLispString

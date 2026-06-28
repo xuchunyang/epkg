@@ -17,6 +17,6 @@
   "license": "GPL-3.0-or-later",
   "dependencies": {
     "mustache": "^4.2.0",
-    "sqlite3": "^6.0.1"
+    "sql.js": "^1.14.1"
   }
 }
