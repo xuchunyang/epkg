@@ -23,9 +23,12 @@ async function buildHTML(pkgName, template) {
   const pkg = JSON.parse(await fs.readFile(jsonFile, "utf8"));
   assert.equal(pkgName, pkg.name);
   fixHomepage(pkg);
+  pkg.homepageDisplay = formatHomepageDisplay(pkg.homepage);
   fixUpdated(pkg);
-  pkg.hasDependencies = pkg.required.length > 0;
-  pkg.hasReverseDependencies = pkg.required_by.length > 0;
+  pkg.dependencyCount = pkg.required.length;
+  pkg.reverseDependencyCount = pkg.required_by.length;
+  pkg.hasDependencies = pkg.dependencyCount > 0;
+  pkg.hasReverseDependencies = pkg.reverseDependencyCount > 0;
   if (pkg.authors) {
     pkg.authors_rendered =
       pkg.authors.map(author => author.name).join(", ");
@@ -54,6 +57,16 @@ function fixHomepage(pkg) {
       pkg.homepage = pkg.homepage.replace(/^git@gitlab.com:(.*)\.git$/, "https://gitlab.com/$1");
       return;
     }
+  }
+}
+
+function formatHomepageDisplay(homepage) {
+  if (!homepage) return "";
+  try {
+    const url = new URL(homepage);
+    return url.host + url.pathname.replace(/\/$/, "");
+  } catch (_e) {
+    return homepage;
   }
 }
 

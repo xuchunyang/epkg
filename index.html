@@ -1,50 +1,225 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Emacs Packages</title>
-    <link href="index.css" rel="stylesheet">
-    <link href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
-    <script>
-      $(document).ready( function () {
-        $("table").DataTable( {
-          ajax: {
-            url: ".index.json",
-            cache: true,
-            dataSrc: "",
-          },
-          deferRender: true,
-          pageLength: 10,
-          stateSave: true
-        });
-
-        document.onclick = e => {
-          if (!e.target.matches("tbody tr td:first-child")) return;
-
-          const pkgName = e.target.textContent;
-          const url = "/" + pkgName;
-
-          // reuse current tab:
-          // window.location.replace(url);
-
-          // open new tab:
-          window.open(url);
-        };
-      } );
-    </script>
+    <link href="/index.css" rel="stylesheet">
   </head>
   <body>
-    <div class="container">
-      <table class="hover">
-        <thead>
-          <th>Package</th>
-          <th>Description</th>
-        </thead>
-      </table>
-    </div>
+    <header class="site-header">
+      <div class="page">
+        <div class="masthead">
+          <div>
+            <p class="eyebrow">EPKG</p>
+            <h1>Emacs Packages</h1>
+          </div>
+          <a class="source-link" href="https://github.com/emacscollective/epkg" rel="noreferrer">Source</a>
+        </div>
+      </div>
+    </header>
+
+    <main class="page">
+      <section class="stats" aria-label="Package statistics">
+        <div>
+          <span class="stat-value" id="package-count">0</span>
+          <span class="stat-label">packages</span>
+        </div>
+        <div>
+          <span class="stat-value" id="github-count">0</span>
+          <span class="stat-label">with source links</span>
+        </div>
+        <div>
+          <span class="stat-value" id="dependency-count">0</span>
+          <span class="stat-label">dependency edges</span>
+        </div>
+      </section>
+
+      <section class="browser" aria-label="Package browser">
+        <div class="toolbar">
+          <label class="search">
+            <span>Search packages</span>
+            <input id="search" type="search" autocomplete="off" placeholder="Name, summary, or author">
+          </label>
+          <label class="sort-control">
+            <span>Sort</span>
+            <select id="sort">
+              <option value="name">Name</option>
+              <option value="updated">Recently updated</option>
+              <option value="stars">Stars</option>
+              <option value="downloads">Downloads</option>
+              <option value="dependencies">Dependencies</option>
+              <option value="reverseDependencies">Reverse dependencies</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="result-meta">
+          <span id="result-count">Loading packages...</span>
+        </div>
+
+        <div id="packages" class="package-list" aria-live="polite"></div>
+        <div id="load-more-wrap" class="load-more-wrap" hidden>
+          <button id="load-more" type="button">Load more</button>
+        </div>
+        <p id="empty" class="empty" hidden>No packages match this search.</p>
+      </section>
+    </main>
+
+    <script>
+      const state = {
+        packages: [],
+        query: "",
+        sort: "name",
+        limit: 150
+      };
+
+      const els = {
+        search: document.querySelector("#search"),
+        sort: document.querySelector("#sort"),
+        packages: document.querySelector("#packages"),
+        loadMoreWrap: document.querySelector("#load-more-wrap"),
+        loadMore: document.querySelector("#load-more"),
+        empty: document.querySelector("#empty"),
+        resultCount: document.querySelector("#result-count"),
+        packageCount: document.querySelector("#package-count"),
+        githubCount: document.querySelector("#github-count"),
+        dependencyCount: document.querySelector("#dependency-count")
+      };
+
+      const numberFormat = new Intl.NumberFormat();
+
+      fetch("/.index.json")
+        .then(response => {
+          if (!response.ok) throw new Error("Could not load package index");
+          return response.json();
+        })
+        .then(packages => {
+          state.packages = packages;
+          renderStats(packages);
+          render();
+        })
+        .catch(error => {
+          els.resultCount.textContent = error.message;
+          els.packages.innerHTML = "";
+        });
+
+      els.search.addEventListener("input", event => {
+        state.query = event.target.value.trim().toLowerCase();
+        state.limit = 150;
+        render();
+      });
+
+      els.sort.addEventListener("change", event => {
+        state.sort = event.target.value;
+        state.limit = 150;
+        render();
+      });
+
+      els.loadMore.addEventListener("click", () => {
+        state.limit += 150;
+        render();
+      });
+
+      function renderStats(packages) {
+        els.packageCount.textContent = numberFormat.format(packages.length);
+        els.githubCount.textContent = numberFormat.format(packages.filter(pkg => pkg.homepage).length);
+        els.dependencyCount.textContent = numberFormat.format(
+          packages.reduce((total, pkg) => total + pkg.dependencyCount + pkg.reverseDependencyCount, 0)
+        );
+      }
+
+      function render() {
+        const packages = getVisiblePackages();
+        const visiblePackages = packages.slice(0, state.limit);
+        const shown = Math.min(packages.length, state.limit);
+        els.resultCount.textContent = `${numberFormat.format(shown)} of ${numberFormat.format(packages.length)} package${packages.length === 1 ? "" : "s"} shown`;
+        els.empty.hidden = packages.length !== 0;
+        els.loadMoreWrap.hidden = shown >= packages.length;
+        els.packages.innerHTML = visiblePackages.map(renderPackage).join("");
+      }
+
+      function getVisiblePackages() {
+        const filtered = state.query ? state.packages.filter(matchesQuery) : [...state.packages];
+        filtered.sort(comparePackages);
+        return filtered;
+      }
+
+      function matchesQuery(pkg) {
+        return [pkg.name, pkg.summary, pkg.author].some(value =>
+          String(value || "").toLowerCase().includes(state.query)
+        );
+      }
+
+      function comparePackages(a, b) {
+        if (state.sort === "updated") {
+          return valueOf(b.updated, "timestamp") - valueOf(a.updated, "timestamp") || a.name.localeCompare(b.name);
+        }
+        if (state.sort === "stars") {
+          return numericSort(a.stars, b.stars) || a.name.localeCompare(b.name);
+        }
+        if (state.sort === "downloads") {
+          return numericSort(a.downloads, b.downloads) || a.name.localeCompare(b.name);
+        }
+        if (state.sort === "dependencies") {
+          return b.dependencyCount - a.dependencyCount || a.name.localeCompare(b.name);
+        }
+        if (state.sort === "reverseDependencies") {
+          return b.reverseDependencyCount - a.reverseDependencyCount || a.name.localeCompare(b.name);
+        }
+        return a.name.localeCompare(b.name);
+      }
+
+      function numericSort(a, b) {
+        return (b ?? -1) - (a ?? -1);
+      }
+
+      function valueOf(object, key) {
+        return object && object[key] ? object[key] : 0;
+      }
+
+      function renderPackage(pkg) {
+        const updated = pkg.updated
+          ? `<time datetime="${escapeHtml(pkg.updated.iso)}">${escapeHtml(pkg.updated.readable)}</time>`
+          : "Unknown";
+        return `
+          <article class="package-row">
+            <div class="package-main">
+              <a class="package-name" href="/${encodeURIComponent(pkg.name)}/">${escapeHtml(pkg.name)}</a>
+              <p>${escapeHtml(pkg.summary || "No summary available.")}</p>
+              <div class="package-meta">
+                ${renderMeta("Author", pkg.author || "Unknown")}
+                ${renderMeta("Updated", updated, true)}
+              </div>
+            </div>
+            <dl class="package-metrics" aria-label="${escapeHtml(pkg.name)} metrics">
+              ${renderMetric("Stars", pkg.stars)}
+              ${renderMetric("Downloads", pkg.downloads)}
+              ${renderMetric("Deps", pkg.dependencyCount)}
+              ${renderMetric("Used by", pkg.reverseDependencyCount)}
+            </dl>
+          </article>
+        `;
+      }
+
+      function renderMeta(label, value, html = false) {
+        return `<span><strong>${label}</strong> ${html ? value : escapeHtml(value)}</span>`;
+      }
+
+      function renderMetric(label, value) {
+        const rendered = value == null ? "-" : numberFormat.format(value);
+        return `<div><dt>${label}</dt><dd>${rendered}</dd></div>`;
+      }
+
+      function escapeHtml(value) {
+        return String(value).replace(/[&<>"']/g, char => ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;"
+        }[char]));
+      }
+    </script>
   </body>
 </html>
-<!-- Updated: $Date: 2026-06-28 $ -->

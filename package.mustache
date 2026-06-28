@@ -1,48 +1,108 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{name}}</title>
-    <link href="package.css" rel="stylesheet">
+    <title>{{name}} - Emacs Packages</title>
+    <link href="/package.css" rel="stylesheet">
   </head>
   <body>
-    <h1>{{name}}</h1>
+    <header class="site-header">
+      <div class="page">
+        <nav class="top-nav" aria-label="Package navigation">
+          <a href="/">EPKG</a>
+          <span>{{name}}</span>
+        </nav>
+        <div class="package-heading">
+          <div>
+            <p class="eyebrow">Package</p>
+            <h1>{{name}}</h1>
+            <p class="summary">{{summary}}</p>
+          </div>
+          {{#homepage}}
+          <a class="homepage-link" href="{{homepage}}" rel="noreferrer">{{homepageDisplay}}</a>
+          {{/homepage}}
+        </div>
+      </div>
+    </header>
 
-    {{#homepage}}
-    <p>Homepage: <a href="{{{homepage}}}">{{{homepage}}}</a></p>
-    {{/homepage}}
+    <main class="page layout">
+      <aside class="metadata" aria-label="Package metadata">
+        {{#authors_rendered}}
+        <div>
+          <span class="meta-label">Author</span>
+          <span class="meta-value">{{authors_rendered}}</span>
+        </div>
+        {{/authors_rendered}}
 
-    {{#authors_rendered}}
-    <p>Author: {{authors_rendered}}</p>
-    {{/authors_rendered}}
+        {{#updated}}
+        <div>
+          <span class="meta-label">Updated</span>
+          <time class="meta-value" datetime="{{updated.iso}}">{{updated.readable}}</time>
+        </div>
+        {{/updated}}
 
-    {{#updated}}
-    <p>Updated: <time datetime="{{updated.iso}}">{{updated.readable}}</time></p>
-    {{/updated}}
-    
-    <h2>Summary</h2>
-    <p>{{summary}}</p>
+        <div>
+          <span class="meta-label">Dependencies</span>
+          <span class="meta-value">{{dependencyCount}}</span>
+        </div>
 
-    <h2>Commentary</h2>
-    <pre>{{{commentary}}}</pre>
+        <div>
+          <span class="meta-label">Used by</span>
+          <span class="meta-value">{{reverseDependencyCount}}</span>
+        </div>
+      </aside>
 
-    {{#hasDependencies}}
-    <h2>Dependencies</h2>
-    <ul>
-      {{#required}}
-      <li><a href="../{{feature}}">{{feature}}</a></li>
-      {{/required}}
-    </ul>
-    {{/hasDependencies}}
+      <div class="content">
+        <section class="panel">
+          <div class="section-heading">
+            <p class="eyebrow">Documentation</p>
+            <h2>Commentary</h2>
+          </div>
+          {{#commentary}}
+          <pre>{{commentary}}</pre>
+          {{/commentary}}
+          {{^commentary}}
+          <p class="muted">No commentary is available for this package.</p>
+          {{/commentary}}
+        </section>
 
-    {{#hasReverseDependencies}}
-    <h2>Reverse dependencies</h2>
-    <ul>
-      {{#required_by}}
-      <li><a href="../{{package}}">{{package}}</a></li>
-      {{/required_by}}
-    </ul>
-    {{/hasReverseDependencies}}
+        <section class="dependency-grid" aria-label="Package relationships">
+          <div class="panel">
+            <div class="section-heading">
+              <p class="eyebrow">Requires</p>
+              <h2>Dependencies</h2>
+            </div>
+            {{#hasDependencies}}
+            <ul class="link-list">
+              {{#required}}
+              <li><a href="/{{feature}}/">{{feature}}</a></li>
+              {{/required}}
+            </ul>
+            {{/hasDependencies}}
+            {{^hasDependencies}}
+            <p class="muted">No package dependencies recorded.</p>
+            {{/hasDependencies}}
+          </div>
+
+          <div class="panel">
+            <div class="section-heading">
+              <p class="eyebrow">Consumers</p>
+              <h2>Reverse Dependencies</h2>
+            </div>
+            {{#hasReverseDependencies}}
+            <ul class="link-list">
+              {{#required_by}}
+              <li><a href="/{{package}}/">{{package}}</a></li>
+              {{/required_by}}
+            </ul>
+            {{/hasReverseDependencies}}
+            {{^hasReverseDependencies}}
+            <p class="muted">No reverse dependencies recorded.</p>
+            {{/hasReverseDependencies}}
+          </div>
+        </section>
+      </div>
+    </main>
   </body>
 </html>
